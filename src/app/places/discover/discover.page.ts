@@ -18,4 +18,8 @@ export class DiscoverPage implements OnInit {
     this.listedLoadedPlaces = this.placesService.places.slice(1);
   }
 
+  onFilterUpdate(event: CustomEvent) {
+    console.log(event.detail);
+  }
+
 }
