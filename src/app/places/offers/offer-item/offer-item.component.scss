@@ -1,0 +1,25 @@
+.offer-date {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+
+  .space-left {
+    margin-left: 5px;
+  }
+}
+
+// h1 {
+//   font-size: 18px;
+//   border: 1px solid var(--ion-color-primary);
+//   padding: 8px;
+//   border-radius: 5px;
+//   color: var(--ion-color-primary);
+// }
+
+.offer-details {
+  font-size: 18px;
+  border: 1px solid var(--ion-color-primary);
+  padding: 8px;
+  border-radius: 5px;
+  color: var(--ion-color-primary);
+}
