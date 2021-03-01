@@ -11,21 +11,27 @@ export class PlacesService {
       'Kuala Lumpur',
       'Heart of Malaysia',
       'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
-      15.90
+      15.90,
+      new Date('2019-01-01'),
+      new Date('2019-12-31')
     ),
     new Place(
       'p2',
       'Petaling Jaya',
       'Heart of Selangor',
       'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
-      13.33
+      13.33,
+      new Date('2019-01-01'),
+      new Date('2019-12-31')
     ),
     new Place(
       'p3',
       'Sri Hartamas',
       'Lots of classy food!',
       'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
-      190.00
+      190.00,
+      new Date('2019-01-01'),
+      new Date('2019-12-31')
     ),
   ];
 
