@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { AuthService } from '../auth/auth.service';
 import { Place } from './place.model';
 
 @Injectable({
@@ -11,9 +12,10 @@ export class PlacesService {
       'Kuala Lumpur',
       'Heart of Malaysia',
       'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
-      15.90,
+      15.9,
       new Date('2019-01-01'),
-      new Date('2019-12-31')
+      new Date('2019-12-31'),
+      'abc'
     ),
     new Place(
       'p2',
@@ -22,16 +24,18 @@ export class PlacesService {
       'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
       13.33,
       new Date('2019-01-01'),
-      new Date('2019-12-31')
+      new Date('2019-12-31'),
+      'abc'
     ),
     new Place(
       'p3',
       'Sri Hartamas',
       'Lots of classy food!',
       'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
-      190.00,
+      190.0,
       new Date('2019-01-01'),
-      new Date('2019-12-31')
+      new Date('2019-12-31'),
+      'abc'
     ),
   ];
 
@@ -40,8 +44,28 @@ export class PlacesService {
   }
 
   getPlace(id: string) {
-    return {...this._places.find(p => p.id === id)};
+    return { ...this._places.find((p) => p.id === id) };
   }
 
-  constructor() {}
+  addPlace(
+    title: string,
+    desc: string,
+    price: number,
+    dateFrom: Date,
+    dateTo: Date
+  ) {
+    const newPlace = new Place(
+      Math.random().toString(),
+      title,
+      desc,
+      'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
+      price,
+      dateFrom,
+      dateTo,
+      this.authService.userId
+    );
+    this._places.push(newPlace);
+  }
+
+  constructor(private authService: AuthService) {}
 }
