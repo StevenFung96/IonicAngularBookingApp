@@ -74,8 +74,31 @@ export class PlacesService {
     return this.places.pipe(
       take(1),
       delay(1000),
-      tap(places => {
+      tap((places) => {
         this._places.next(places.concat(newPlace));
+      })
+    );
+  }
+
+  udpatePlace(placeId: string, title: string, desc: string) {
+    return this.places.pipe(
+      take(1),
+      delay(1000),
+      tap((places) => {
+        const updatedPlaceIndex = places.findIndex((pl) => pl.id === placeId);
+        const updatedPlaces = [...places];
+        const oldPlace = updatedPlaces[updatedPlaceIndex];
+        updatedPlaces[updatedPlaceIndex] = new Place(
+          oldPlace.id,
+          title,
+          desc,
+          oldPlace.imgUrl,
+          oldPlace.price,
+          oldPlace.availableFrom,
+          oldPlace.availableTo,
+          oldPlace.userId
+        );
+        this._places.next(updatedPlaces);
       })
     );
   }
