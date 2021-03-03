@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { delay, map, take, tap } from 'rxjs/operators';
@@ -41,6 +42,8 @@ export class PlacesService {
     ),
   ]);
 
+  constructor(private authService: AuthService, private http: HttpClient) {}
+
   get places() {
     return this._places.asObservable();
   }
@@ -71,13 +74,19 @@ export class PlacesService {
       dateTo,
       this.authService.userId
     );
-    return this.places.pipe(
-      take(1),
-      delay(1000),
-      tap((places) => {
-        this._places.next(places.concat(newPlace));
-      })
-    );
+    return this.http
+      .post(
+        'https://ionicangularbookingapp-default-rtdb.firebaseio.com/offered-places.json',
+        {
+          ...newPlace,
+          id: null,
+        }
+      )
+      .pipe(
+        tap((response) => {
+          console.log(response);
+        })
+      );
   }
 
   udpatePlace(placeId: string, title: string, desc: string) {
@@ -102,6 +111,4 @@ export class PlacesService {
       })
     );
   }
-
-  constructor(private authService: AuthService) {}
 }
