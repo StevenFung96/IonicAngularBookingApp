@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { delay, map, take, tap } from 'rxjs/operators';
+import { delay, map, switchMap, take, tap } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
 import { Place } from './place.model';
 
@@ -64,6 +64,7 @@ export class PlacesService {
     dateFrom: Date,
     dateTo: Date
   ) {
+    let generatedId: string;
     const newPlace = new Place(
       Math.random().toString(),
       title,
@@ -75,7 +76,7 @@ export class PlacesService {
       this.authService.userId
     );
     return this.http
-      .post(
+      .post<{ name: string }>(
         'https://ionicangularbookingapp-default-rtdb.firebaseio.com/offered-places.json',
         {
           ...newPlace,
@@ -83,8 +84,14 @@ export class PlacesService {
         }
       )
       .pipe(
-        tap((response) => {
-          console.log(response);
+        switchMap(response => {
+          generatedId = response.name;
+          return this.places;
+        }),
+        take(1),
+        tap(places => {
+          newPlace.id = generatedId;
+          this._places.next(places.concat(newPlace));
         })
       );
   }
