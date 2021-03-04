@@ -1,6 +1,7 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { delay, take, tap } from 'rxjs/operators';
+import { delay, switchMap, take, tap } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
 import { Booking } from './booking.model';
 
@@ -14,7 +15,7 @@ export class BookingsService {
     return this._bookings.asObservable();
   }
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private http: HttpClient) {}
 
   addBooking(
     placeId: string,
@@ -26,6 +27,7 @@ export class BookingsService {
     dateFrom: Date,
     dateTo: Date
   ) {
+    let generatedId: string;
     const newBooking = new Booking(
       Math.random().toString(),
       placeId,
@@ -38,21 +40,33 @@ export class BookingsService {
       dateFrom,
       dateTo
     );
-    return this.bookings.pipe(
-      take(1),
-      delay(1000),
-      tap(bookings => {
-        this._bookings.next(bookings.concat(newBooking));
-      })
-    );
+    return this.http
+      .post<{ name: string }>(
+        'https://ionicangularbookingapp-default-rtdb.firebaseio.com/bookings.json',
+        {
+          ...newBooking,
+          id: null,
+        }
+      )
+      .pipe(
+        switchMap((response) => {
+          generatedId = response.name;
+          return this.bookings;
+        }),
+        take(1),
+        tap((bookings) => {
+          newBooking.id = generatedId;
+          this._bookings.next(bookings.concat(newBooking));
+        })
+      );
   }
 
   cancelBooking(bookingId: string) {
     return this.bookings.pipe(
       take(1),
       delay(1000),
-      tap(bookings => {
-        this._bookings.next(bookings.filter(b => b.id !== bookingId));
+      tap((bookings) => {
+        this._bookings.next(bookings.filter((b) => b.id !== bookingId));
       })
     );
   }
