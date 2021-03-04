@@ -5,47 +5,91 @@ import { delay, map, switchMap, take, tap } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
 import { Place } from './place.model';
 
+// [
+//   new Place(
+//     'p1',
+//     'Kuala Lumpur',
+//     'Heart of Malaysia',
+//     'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
+//     15.9,
+//     new Date('2019-01-01'),
+//     new Date('2019-12-31'),
+//     'abc'
+//   ),
+//   new Place(
+//     'p2',
+//     'Petaling Jaya',
+//     'Heart of Selangor',
+//     'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
+//     13.33,
+//     new Date('2019-01-01'),
+//     new Date('2019-12-31'),
+//     'abc'
+//   ),
+//   new Place(
+//     'p3',
+//     'Sri Hartamas',
+//     'Lots of classy food!',
+//     'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
+//     190.0,
+//     new Date('2019-01-01'),
+//     new Date('2019-12-31'),
+//     'abc'
+//   ),
+// ]
+
+interface PlaceData {
+  availableFrom: string;
+  availableTo: string;
+  desc: string;
+  imgUrl: string;
+  price: number;
+  title: string;
+  userId: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class PlacesService {
-  private _places = new BehaviorSubject<Place[]>([
-    new Place(
-      'p1',
-      'Kuala Lumpur',
-      'Heart of Malaysia',
-      'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
-      15.9,
-      new Date('2019-01-01'),
-      new Date('2019-12-31'),
-      'abc'
-    ),
-    new Place(
-      'p2',
-      'Petaling Jaya',
-      'Heart of Selangor',
-      'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
-      13.33,
-      new Date('2019-01-01'),
-      new Date('2019-12-31'),
-      'abc'
-    ),
-    new Place(
-      'p3',
-      'Sri Hartamas',
-      'Lots of classy food!',
-      'https://png.pngtree.com/png-clipart/20190619/original/pngtree-hand-painted-anime-food-material-japanese-food-pork-cutlet-curry-rice-png-image_4019838.jpg',
-      190.0,
-      new Date('2019-01-01'),
-      new Date('2019-12-31'),
-      'abc'
-    ),
-  ]);
+  private _places = new BehaviorSubject<Place[]>([]);
 
   constructor(private authService: AuthService, private http: HttpClient) {}
 
   get places() {
     return this._places.asObservable();
+  }
+
+  fetchPlaces() {
+    return this.http
+      .get<{ [key: string]: PlaceData }>(
+        'https://ionicangularbookingapp-default-rtdb.firebaseio.com/offered-places.json'
+      )
+      .pipe(
+        map((response) => {
+          const places = [];
+          for (const key in response) {
+            if (response.hasOwnProperty(key)) {
+              places.push(
+                new Place(
+                  key,
+                  response[key].title,
+                  response[key].desc,
+                  response[key].imgUrl,
+                  response[key].price,
+                  new Date(response[key].availableFrom),
+                  new Date(response[key].availableTo),
+                  response[key].userId
+                )
+              );
+            }
+          }
+          return places;
+        }),
+        tap((places) => {
+          this._places.next(places);
+        })
+      );
   }
 
   getPlace(id: string) {
@@ -84,12 +128,12 @@ export class PlacesService {
         }
       )
       .pipe(
-        switchMap(response => {
+        switchMap((response) => {
           generatedId = response.name;
           return this.places;
         }),
         take(1),
-        tap(places => {
+        tap((places) => {
           newPlace.id = generatedId;
           this._places.next(places.concat(newPlace));
         })
