@@ -55,18 +55,18 @@ export class NewOfferPage implements OnInit {
       .then((loadingEl) => {
         loadingEl.present();
         this.placesService
-        .addPlace(
-          this.form.value.title,
-          this.form.value.desc,
-          +this.form.value.price,
-          new Date(this.form.value.dateFrom),
-          new Date(this.form.value.dateTo)
-        )
-        .subscribe(() => {
-          loadingEl.dismiss();
-          this.form.reset();
-          this.router.navigate(['/places/tabs/offers']);
-        });
+          .addPlace(
+            this.form.value.title,
+            this.form.value.desc,
+            +this.form.value.price,
+            new Date(this.form.value.dateFrom),
+            new Date(this.form.value.dateTo)
+          )
+          .subscribe(() => {
+            loadingEl.dismiss();
+            this.form.reset();
+            this.router.navigate(['/places/tabs/offers']);
+          });
       });
   }
 }
