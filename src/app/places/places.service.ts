@@ -93,10 +93,20 @@ export class PlacesService {
   }
 
   getPlace(id: string) {
-    return this.places.pipe(
-      take(1),
-      map((places) => {
-        return { ...places.find((p) => p.id === id) };
+    return this.http.get<PlaceData>(
+      `https://ionicangularbookingapp-default-rtdb.firebaseio.com/offered-places/${id}.json`
+    ).pipe(
+      map(response => {
+        return new Place(
+          id,
+          response.title,
+          response.desc,
+          response.imgUrl,
+          response.price,
+          new Date(response.availableFrom),
+          new Date(response.availableTo),
+          response.userId,
+        );
       })
     );
   }
@@ -144,7 +154,7 @@ export class PlacesService {
     let updatedPlaces: Place[];
     return this.places.pipe(
       take(1),
-      switchMap(places => {
+      switchMap((places) => {
         const updatedPlaceIndex = places.findIndex((pl) => pl.id === placeId);
         updatedPlaces = [...places];
         const oldPlace = updatedPlaces[updatedPlaceIndex];
